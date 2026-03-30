@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Online Test Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <style>
+    :root {
+      --primary-color: #5c67f2;
+      --secondary-color: #8f94fb;
+      --accent-color: #ff6b6b;
+      --text-color: #2d3436;
+      --bg-color: #f0f2f5;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      background: var(--white);
+      min-height: 100vh;
+      padding: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    #nameInput { 
+      text-align: center; 
+      padding-top: 50px;
+    }
+
+    /* Lucent Text Styling */
+    .category-tag {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3436;
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    h2 { font-size: 24px; color: var(--primary-color); margin-top: 0; margin-bottom: 20px; font-weight: 700; }
+    
+    #studentName {
+      width: 90%;
+      max-width: 400px;
+      padding: 16px;
+      font-size: 16px;
+      border: 2px solid #edf2f7;
+      border-radius: 12px;
+      outline: none;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .start-btn {
+      width: 90%;
+      max-width: 400px;
+      padding: 16px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #testContainer { display: none; }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px 5px;
+    }
+
+    #testTitle { font-weight: 600; color: #636e72; font-size: 14px; }
+    
+    #timer {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent-color);
+      background: #fff5f5;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+
+    #progressBar {
+      width: 100%;
+      background: #f1f3f5;
+      height: 6px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    #progressBar div {
+      height: 100%;
+      background: var(--primary-color);
+      width: 0%;
+      transition: 0.4s ease;
+    }
+
+    .question {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      color: var(--text-color);
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      padding: 14px 15px;
+      border: 2px solid #f1f3f5;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+      background: #fff;
+    }
+
+    .option-label.selected {
+      border-color: var(--primary-color);
+      background: #f0f3ff;
+    }
+
+    .option-label input { display: none; }
+
+    .custom-radio {
+      height: 20px;
+      width: 20px;
+      border: 2px solid #cbd5e0;
+      border-radius: 50%;
+      margin-right: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .option-label.selected .custom-radio { border-color: var(--primary-color); }
+    .option-label.selected .custom-radio::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: var(--primary-color);
+      border-radius: 50%;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 30px;
+      padding: 15px 0;
+    }
+
+    @media (max-width: 767px) {
+      .container { padding-bottom: 90px; }
+      .buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 15px;
+        margin-top: 0;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        z-index: 100;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container { min-height: auto; margin-top: 20px; border-radius: 20px; }
+      .buttons { position: relative; box-shadow: none; }
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .prev { background: #f1f3f5; color: #636e72; }
+    .next { background: var(--primary-color); color: white; }
+    .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .summary-box {
+      max-height: 250px;
+      overflow-y: auto;
+      text-align: left;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="nameInput">
+      <span class="category-tag">📖 Lucent - Science</span>
+      <h2>Quiz : By Rahul Kumar</h2>
+      
+      <input type="text" id="studentName" placeholder="Enter Your Name" autocomplete="off">
+      <br>
+      <button class="start-btn" onclick="startTest()">Start Test</button>
+    </div>
+
+    <div id="testContainer">
+      <div class="top-bar">
+        <span id="testTitle">Candidate</span>
+        <div id="timer">🕒 10:00</div>
+      </div>
+      
+      <div id="progressBar"><div></div></div>
+      
+      <div id="quiz"></div>
+
+      <div class="buttons">
+        <button id="prevBtn" class="nav-btn prev" onclick="previousQuestion()">Previous</button>
+        <button id="nextBtn" class="nav-btn next" onclick="handleNext()">Next</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const questions = [
+    { "question": "भारत में वर्तमान में कुल कितने प्रमुख बंदरगाह (Major Ports) हैं —", "options": ["10", "12", "13", "15"], "answer": "13" },
+    { "question": "भारत का सबसे पुराना कृत्रिम (Artificial) बंदरगाह कौन सा है —", "options": ["मुंबई", "चेन्नई", "कांडला", "विशाखापत्तनम"], "answer": "चेन्नई" },
+    { "question": "'Gateway of India' के रूप में किस बंदरगाह को जाना जाता है —", "options": ["कोलकाता", "कांडला", "मुंबई", "कोच्चि"], "answer": "मुंबई" },
+    { "question": "भारत का सबसे बड़ा कंटेनर पोर्ट (न्हावा शेवा) कौन सा है —", "options": ["जवाहरलाल नेहरू पोर्ट", "एन्नोर पोर्ट", "पारादीप पोर्ट", "तूतीकोरिन पोर्ट"], "answer": "जवाहरलाल नेहरू पोर्ट" },
+    { "question": "कांडला बंदरगाह का नया नाम क्या रखा गया है —", "options": ["श्यामा प्रसाद मुखर्जी पोर्ट", "दीनदयाल पोर्ट", "कामrajar पोर्ट", "वी.ओ. चिदंबरनार पोर्ट"], "answer": "दीनदयाल पोर्ट" },
+    
+     { "question": "भारत में वर्तमान में कुल कितने प्रमुख बंदरगाह (Major Ports) हैं —", "options": ["10", "12", "13", "15"], "answer": "13" },
+    { "question": "भारत का सबसे पुराना कृत्रिम (Artificial) बंदरगाह कौन सा है —", "options": ["मुंबई", "चेन्नई", "कांडला", "विशाखापत्तनम"], "answer": "चेन्नई" },
+    { "question": "'Gateway of India' के रूप में किस बंदरगाह को जाना जाता है —", "options": ["कोलकाता", "कांडला", "मुंबई", "कोच्चि"], "answer": "मुंबई" },
+    { "question": "भारत का सबसे बड़ा कंटेनर पोर्ट (न्हावा शेवा) कौन सा है —", "options": ["जवाहरलाल नेहरू पोर्ट", "एन्नोर पोर्ट", "पारादीप पोर्ट", "तूतीकोरिन पोर्ट"], "answer": "जवाहरलाल नेहरू पोर्ट" },
+    { "question": "कांडला बंदरगाह का नया नाम क्या रखा गया है —", "options": ["श्यामा प्रसाद मुखर्जी पोर्ट", "दीनदयाल पोर्ट", "कामrajar पोर्ट", "वी.ओ. चिदंबरनार पोर्ट"], "answer": "दीनदयाल पोर्ट" }
+  ];
+
+  let currentIdx = 0;
+  let userAns = new Array(questions.length).fill(null);
+  let timeLeft = 600;
+  let timerId = null;
+  let sName = "";
+
+  function startTest() {
+    sName = document.getElementById('studentName').value.trim();
+    if(!sName) return Swal.fire('Wait!', 'Please enter your name.', 'warning');
+    document.getElementById('nameInput').style.display = 'none';
+    document.getElementById('testContainer').style.display = 'block';
+    loadQuestion();
+    timerId = setInterval(() => {
+      timeLeft--;
+      let m = Math.floor(timeLeft/60), s = timeLeft%60;
+      document.getElementById('timer').innerText = `🕒 ${m}:${s<10?'0':''}${s}`;
+      if(timeLeft <= 0) submitQuiz();
+    }, 1000);
+  }
+
+  function loadQuestion() {
+    const q = questions[currentIdx];
+    document.getElementById('testTitle').innerText = `Candidate: ${sName}`;
+    
+    document.getElementById('quiz').innerHTML = `
+      <div class="question">(${currentIdx+1}/${questions.length}). ${q.question}</div>
+      <div class="options">
+        ${q.options.map(o => `
+          <label class="option-label ${userAns[currentIdx] === o ? 'selected' : ''}" onclick="saveAns('${o}', this)">
+            <input type="radio" name="answer" ${userAns[currentIdx] === o ? 'checked' : ''}>
+            <div class="custom-radio"></div>
+            <span>${o}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+    
+    document.getElementById('prevBtn').disabled = currentIdx === 0;
+    document.getElementById('nextBtn').innerText = currentIdx === questions.length - 1 ? 'Submit' : 'Next';
+    document.getElementById('progressBar').firstElementChild.style.width = `${((currentIdx+1)/questions.length)*100}%`;
+    
+    if(window.innerWidth < 768) window.scrollTo(0,0);
+  }
+
+  window.saveAns = (val, el) => {
+    userAns[currentIdx] = val;
+    document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function previousQuestion() { if(currentIdx > 0) { currentIdx--; loadQuestion(); } }
+
+  function handleNext() {
+    if(currentIdx < questions.length - 1) { currentIdx++; loadQuestion(); }
+    else {
+      Swal.fire({
+        title: 'Submit Quiz?',
+        text: "Are you sure you want to finish the test?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#5c67f2',
+        confirmButtonText: 'Yes, Submit'
+      }).then((r) => { if(r.isConfirmed) submitQuiz(); });
+    }
+  }
+
+  function submitQuiz() {
+    clearInterval(timerId);
+    let score = 0, summary = "";
+    questions.forEach((q, i) => {
+      let isCorrect = userAns[i] === q.answer;
+      if(isCorrect) score++;
+      summary += `<div style="padding:8px 0; border-bottom:1px solid #eee;">
+        <strong>${i+1}. ${q.question}</strong><br>
+        <span style="color:${isCorrect?'green':'red'}">Your Ans: ${userAns[i]||'Skipped'}</span><br>
+        ${!isCorrect?`<span style="color:green">Correct: ${q.answer}</span>`:''}
+      </div>`;
+    });
+
+    const per = Math.round((score/questions.length)*100);
+    
+    Swal.fire({
+      title: 'Test Completed!',
+      icon: 'success',
+      html: `
+        <div style="font-size:18px; color:var(--primary-color); font-weight:700;">Student: ${sName}</div>
+        <div style="font-size:16px; margin: 10px 0;">Score: ${score} / ${questions.length} (${per}%)</div>
+        <div class="summary-box">${summary}</div>`,
+      confirmButtonText: 'Restart Quiz'
+    }).then(() => location.reload());
+  }
+</script>
+</body>
+</html>
